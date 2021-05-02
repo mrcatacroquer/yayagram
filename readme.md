@@ -10,6 +10,13 @@ In this guide I'll explain you how to build your own Yayagram.
 
 https://twitter.com/mrcatacroquer/status/1386318806411325440?s=20
 
+# Disclaimer
+
+I'm not an expert, I'm not a guru, I'm just an average guy.
+So, if you see something that can be improved, fork it and change it, you are
+also very welcome to comment anything or ask me anything. I'll be happy to keep
+learning and help.
+
 # Ingredients
 
 To build the original Yayagram you will need  the following items but you can
@@ -19,21 +26,23 @@ a few variations.
 | Item      | Description | Average price |
 | ----------- | ----------- | ----------- |
 |[Raspberry pi 4](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/) | The brain of the project|40€
-| [Jack connectors and sockets](https://en.wikipedia.org/wiki/Phone_connector_(audio))|To access the source and destination people| 20€ |
-| Microphone cable | To connect people | 3€
-| 32Gb Micro SD Card | To store the Raspberry Pi OS | 8€
-| Arcade button | To start recording the message|1€
-| USB Microphone | To record the message|10€
-|  Thermal printer. | To print the messages|30€
-|  Powerful power supply 5V | Juice for the Pi |10€
-|  Powerful power supply 9V | Juice for the thermal printer|10€
-|  Cables. | For the electronic connections|3€
-|  A box. | To frame the project |10€
-|  HDMI Cable | To connect the Pi to a screen|10€
-|  A screen, keyboard and mouse.| To do the first Pi setup |0€
+|[Jack connectors and sockets](https://en.wikipedia.org/wiki/Phone_connector_(audio))|To access the source and destination people| 20€ |
+|Microphone cable | To connect people | 3€
+|32Gb Micro SD Card | To store the Raspberry Pi OS | 8€
+|Arcade button | To start recording the message|1€
+|USB Microphone | To record the message|10€
+|Thermal printer. | To print the messages|30€
+|Powerful power supply 5V | Juice for the Pi |10€
+|Powerful power supply 9V | Juice for the thermal printer|10€
+|Cables. | For the electronic connections|3€
+|A box. | To frame the project |10€
+|HDMI Cable | To connect the Pi to a screen|10€
+
+I assume that you already have basic items like a soldering iron, a screen,
+a keyboard and a mouse. So the total cost is around 155€.
 
 I recommend you to buy all the items at your local electronic shop. It might
-be slighter more expensive but it's important to support your local business.
+be slighter more expensive but it's important to support the local business.
 
 Some parts like the thermal printer might be hard to find, so for those search
 the internet to find the cheapest option.
@@ -41,11 +50,11 @@ the internet to find the cheapest option.
 # Raspberry Pi setup
 
 First you will need to install the most up to date Raspberry Pi OS in your
-raspberry pi. There's a tool called "Raspberry Pi Imager" that does it in no
-time.
+Raspberry Pi SD card. There's a tool called "Raspberry Pi Imager" that does it
+in no time and it's very straightforward to use.
 
-Open the Raspberry Pi Imager, you need to chose the OS you want to install, and
-the SD card you want to use for the Raspberry Pi.
+Open the Raspberry Pi Imager tool, you need to choose the OS you want to
+install, and the SD card you want to use for the Raspberry Pi.
 
 I chose the default "Raspberry PI OS" which is based on Debian, and optimized
 for the Raspberry Pi hardware.
@@ -56,11 +65,12 @@ insert it inside the Raspberry Pi.
 ### Boot your Raspberry Pi and first steps.
 
 The first time you boot your Raspberry Pi it might take more time to start, it's
-normal, it has to configure a lot of things, but you will also need to help it.
+normal, it has to automatically configure a lot of things, but you will also need
+to accomplish some manual steps.
 
 The start-up wizard will ask you to select:
 - Your time zone.
-- Language
+- Language.
 - Wifi network to connect to.
 
 After you made your selection it will ask you to do a software upgrade, I
@@ -78,17 +88,17 @@ something.
 
 Open a terminal window in your Raspberry Pi, [here you can find how](https://magpi.raspberrypi.org/articles/terminal-help). And now type the following
 commands:
-```shell
+```
 sudo systemctl enable ssh
 sudo systemctl start ssh
 ```
 
 This is going to be useful when we turn the rasp into a headless machine.
 
-To check the Rasp Pi IP you can run a ping command using the default Pi name:
-raspberrypi
+To check the Rasp Pi IP you can run a ping command from another computer
+connected to the same network, use the default Pi name: "*raspberrypi*"
 
-```shell
+```
 C:\Users\manu>ping -4 raspberrypi
 
 Pinging raspberrypi.local [192.168.2.159] with 32 bytes of data:
@@ -97,9 +107,7 @@ Reply from 192.168.2.159: bytes=32 time=5ms TTL=64
 Reply from 192.168.2.159: bytes=32 time=5ms TTL=64
 Reply from 192.168.2.159: bytes=32 time=5ms TTL=64
 ```
-
 So now, using Putty, we can access it to install what is left to do.
-
 ```
 login as: pi
 pi@192.168.2.159's password:
@@ -116,11 +124,9 @@ pi@raspberrypi:~ $
 ```
 
 # Software
-
 Let's talk about the software needed for this project.
 
 ### Telegram
-
 This project use Telegram to send and receive messages using the Raspberry Pi.
 We need to components, one is a command line interface to do all the Telegram
 actions, the other a wrapper in Python that uses the first application and
@@ -271,7 +277,46 @@ Setup USB Mic: https://pimylifeup.com/raspberrypi-microphone/
 
 ### Printer
 
+# Creating the Systemd service
 
+In order to execute the yayagram.py script on the Raspberry Pi and restart it
+in case of unexpected crashes we are going to create a Systemd service.
+
+[Here](https://www.shubhamdipt.com/blog/how-to-create-a-systemd-service-in-linux/)
+you can read more about how to do it with extra details, but I'm going to give
+you the minimal information to get it running.
+
+Create a file at "/etc/systemd/system" called *yayagram.service*, and add the
+following content:
+
+```
+[Unit]
+Description=The Yayagram
+After=multi-user.target network.target syslog.target
+
+[Service]
+Restart=on-failure
+RestartSec=4
+Type=idle
+WorkingDirectory=/home/pi/Desktop
+User=pi
+ExecStart=/usr/bin/python3 /home/pi/Desktop/yayagram.py
+
+[Install]
+WantedBy=multi-user.target
+```
+Reload the services list:
+```
+sudo systemctl daemon-reload
+```
+Start the ysyagram service:
+```
+sudo systemctl start yayagram.service
+```
+And, enable it so it starts the next time you reboot your Raspberry Pi:
+```
+sudo systemctl enable example.service
+```
 
 ### LEDS
 
