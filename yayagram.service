@@ -1,0 +1,14 @@
+[Unit]
+Description=The Yayagram
+After=multi-user.target network.target syslog.target
+
+[Service]
+Restart=on-failure
+RestartSec=4
+Type=idle
+WorkingDirectory=/home/pi/Desktop
+User=pi
+ExecStart=/usr/bin/python3 /home/pi/Desktop/yayagram.py
+
+[Install]
+WantedBy=multi-user.target
