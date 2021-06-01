@@ -3,7 +3,10 @@
 # Intro
 Hello! I'm Manu ([@mrcatacroquer](https://twitter.com/mrcatacroquer)), the guy who created the first Yayagram, A machine that helps our beloved elders to keep communicating with their grandchildren. Here I share with you the steps to build yours!
 
-If you want to support my work and allow me to keep building crazy contraptions please [buy me a pizza](https://www.buymeacoffee.com/yayagram).
+If you want to support my work and allow me to keep building crazy contraptions please consider buying me a pizza.
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/yayagram)
+
+![Yayagram](https://content.instructables.com/ORIG/FJA/2BIB/KPCMFVQ2/FJA2BIBKPCMFVQ2.jpg)
 
 # Disclaimer
 I'm not an expert, I'm just an average guy that likes building contraptions. So, if you see something that can be improved, fork it and change it, you are also very welcome to comment on anything or ask me anything. I'll be happy to keep learning and help you.
@@ -17,7 +20,7 @@ To build the original Yayagram you will need the following items but you can cha
 
 | Item      | Description | Average price | Where to buy |
 | ----------- | ----------- | ----------- | ------------ |
-|[Raspberry Pi Zero W](https://www.raspberrypi.org/products/raspberry-pi-4-model-b/) | The brain of the project|11€| [Kubii Link](https://www.kubii.es/raspberry-pi-3-2-b/1851-raspberry-pi-zero-w-kubii-3272496006997.html?search_query=raspberry+pi+zero+w&results=27)
+|[Raspberry Pi Zero W](https://www.raspberrypi.org/products/raspberry-pi-zero-w/) | The brain of the project|11€| [Kubii Link](https://www.kubii.es/raspberry-pi-3-2-b/1851-raspberry-pi-zero-w-kubii-3272496006997.html?search_query=raspberry+pi+zero+w&results=27)
 |[Jack connectors and sockets](https://en.wikipedia.org/wiki/Phone_connector_(audio))|To be used as the address for the Yaya and the grandchildren| 20€ | Local shop
 |Microphone cable | To connect the Yaya with the grandchildren | 3€ | Local shop
 |8Gb Micro SD Card | To store the Raspberry Pi OS | 5€ | [Kubii link](https://www.kubii.es/tarjeta-sd-y-almacenamiento/2221-tarjeta-microsd-8gb-class-10-emtec-kubii-3126170158444.html?search_query=SD&results=99)
@@ -37,6 +40,7 @@ I assume that you already have basic items like a soldering iron, a screen, a ke
 # Raspberry Pi setup
 First, you will need to install the most up-to-date Raspberry Pi OS on your Raspberry Pi SD card. There's a tool called "Raspberry Pi Imager" that does it in no time and it's very straightforward to use. Get it [here](https://www.raspberrypi.org/software).
 
+![PiImager](https://content.instructables.com/ORIG/FHN/LZVN/KPCMFVOI/FHNLZVNKPCMFVOI.png)
 Open the Raspberry Pi Imager tool, you need to choose the OS you want to install, and the SD card you want to use for the Raspberry Pi. I chose the default "Raspberry PI OS" which is based on Debian and optimized for the Raspberry Pi hardware.
 
 Once the flashing process finishes you can remove the SD card from the reader and insert it inside the Raspberry Pi to boot it up for the very first time.
@@ -120,7 +124,12 @@ pi@raspberrypi:~ $
 ```
 
 # Software
-Let's talk about the software needed for this project.
+Let's now talk about the software needed for this project.
+
+### Yayagram Python code
+Get the code I wrote from github: https://github.com/mrcatacroquer/Yayagram
+
+You can place the "yayagram.py", "yayagram.conf" and "Adafruit_Thermal.py" files at the Pi Desktop.
 
 ### Telegram
 This project use Telegram to send and receive messages using the Raspberry Pi.
@@ -128,7 +137,7 @@ We need two components, one is a command-line interface to do all the Telegram a
 
 #### TG CLI
 
-[This](https://github.com/kenorb-contrib/tg) is the command line for Telegram as the core of the sudo telegram communications.
+[This](https://github.com/kenorb-contrib/tg) is the command line for Telegram as the core of the telegram communications.
 
 Execute the commands below to download and compile the project:
 
@@ -246,16 +255,19 @@ You should see something like this on the destination phone:
 
 On the hardware side, we are going to work with cables, connectors, LEDs, a button, and a microphone.
 
+![All hardware](https://content.instructables.com/ORIG/FWZ/3G3Q/KPCMGC1T/FWZ3G3QKPCMGC1T.jpg)
 ### GPIO
 
 GPIO pins are going to be used to read the input signals. User the *pinout* command to check the GPIO ports you can use.
 
 Never connect the 5V power directly to the GPIO as it only accepts 3.3V. [Source](https://raspberrypi.stackexchange.com/questions/14680/raspberry-pi-gpio-input-pins-give-random-values)
 
+![raspberrypi](https://content.instructables.com/ORIG/FPR/JMT1/KPCMFVO1/FPRJMT1KPCMFVO1.jpg)
 ## Jack sockets
+
 One socket is for the Yaya, and there will be multiple ones for the grandchildren Oh! and a special one to connect the Yaya with all the grandchildren at the same time. This is the type of sockets I'm using:
 
-![Socket](https://github.com/mrcatacroquer/Yayagram/blob/c2832238833fbda0dac42897f88c0f9052e2e0fc/images/IMG_8637.JPEG)
+![Socket](https://content.instructables.com/ORIG/F9D/KMF1/KPCMFVO4/F9DKMF1KPCMFVO4.jpg)
 
 The Yaya socket is connected to the first pin, it's a 3.3V pin, so the current is going to flow from Pin1 to the grandchildren pins through the sockets and the cable. To know which grandchildren are selected we just need to check which one is receiving 3.3V.
 
@@ -280,16 +292,23 @@ In my case I used 8 for the destinations, I used the following free GPIO pins:
 ## Cable
 The cable setup is easy, I used the following connector, you need two, one for the source (the Yaya), another one for the destination (grandchildren).
 
-The cable looks like ![this](https://github.com/mrcatacroquer/Yayagram/blob/42eb97c3873d2ab9ef27cd3d421dd03ed9d28dc2/images/IMG_8635.JPEG), it has two more cables inside, solder them to the connector terminal.
+The cable looks like this:
+![this](https://content.instructables.com/ORIG/FT1/TBQX/KPCMGDK0/FT1TBQXKPCMGDK0.jpg)
+
+As you can see it has two more cables inside, solder them to the connector terminal.
 
 This is how it looks after soldering them, do it at both ends of the cable.
 
 ## Button
+
+![Button](https://content.instructables.com/ORIG/FJA/Y4E1/KPCMFVOM/FJAY4E1KPCMFVOM.jpg)
 The button is really simple, just connect one side of the button to a 3.3V pin, the other side to a small resistor, and finally to the GPIO pin you want to use to read if the button has been pushed. I chose the PIN4, *RECORD_BUTTON_PIN* in the code.
 
 [Here](https://raspberrypihq.com/use-a-push-button-with-raspberry-pi-gpio/) you can read more about how to use a push-button using a Raspberry Pi.
 
 ## Microphone
+![micro](https://content.instructables.com/ORIG/FYM/DMSP/KPCMGDPF/FYMDMSPKPCMGDPF.jpg)
+
 The microphone is directly connected to a Raspberry Pi USB port.
 
 Once you connect it, run the following command to check if it has been recognized by Linux:
@@ -320,6 +339,8 @@ If the recording volume is low, or too high, you can adjust the gain for the mic
 
 ### Printer
 
+![Printer](https://content.instructables.com/ORIG/FHD/1ZCV/KPCMFVNO/FHD1ZCVKPCMFVNO.jpg)
+
 Connecting the thermal printer to the Raspberry Pi is straightforward. The thermal printers usually have two connectors and five pins.
 
 The power pins (two) must be connected to a power supply, I used one that provides 9V up to 3A and works fine. But check your printer as 5v might be enough. Just keep in mind it will require a few amps to work right.
@@ -337,6 +358,20 @@ That makes five pins in total, the one I used has the ports in this order:
 I have tested two different types of thermal printers, both work at 5v and 9v but the "test print" mode is different.
 
 One print a "test page" if you press and hold the paper feed button while you connect the printer to the power. The other one prints the "test page" if you connect the printer to the power and then you press and hold the feed button for a couple of seconds. This is a good way to check if everything is fine with the printer.
+
+### LEDS
+
+![Leds](https://content.instructables.com/ORIG/F8O/GAQ9/KPCMFVO3/F8OGAQ9KPCMFVO3.jpg)
+LEDs are very easy to set up, you just need the LED, a proper resistor, and cables.
+
+Notice LEDs have polarity, so identify the positive leg and connect it to a GPIO pin, we will use it from the Python code to turn it on and off. The other LED leg can be connected to the resistor and later to the ground pin.
+
+I use three LEDs in my Yayagram:
+- Power led. Always connected, I used one of the 5V pins available.
+- STA TUS_LED_PIN at PIN10
+- RECORDING_LED_PIN at PIN17
+
+Read this easy [tutorial](https://thepihut.com/blogs/raspberry-pi-tutorials/27968772-turning-on-an-led-with-your-raspberry-pis-gpio-pins) to learn more about how to use LEDs in a Raspberry Pi.
 
 # Creating the Systemd service
 To execute the yayagram.py script on the Raspberry Pi and restart it in case of unexpected crashes we are going to create a Systemd service.
@@ -374,20 +409,6 @@ And, enable it so it starts the next time you reboot your Raspberry Pi:
 ```
 sudo systemctl enable example.service
 ```
-
-### LEDS
-
-LEDs are very easy to set up, you just need the LED, a proper resistor, and cables.
-
-Notice LEDs have polarity, so identify the positive leg and connect it to a GPIO pin, we will use it from the Python code to turn it on and off. The other LED leg can be connected to the resistor and later to the ground pin.
-
-I use three LEDs in my Yayagram:
-- Power led. Always connected, I used one of the 5V pins available.
-- STA TUS_LED_PIN at PIN10
-- RECORDING_LED_PIN at PIN17
-
-Read this easy [tutorial](https://thepihut.com/blogs/raspberry-pi-tutorials/27968772-turning-on-an-led-with-your-raspberry-pis-gpio-pins) to learn more about how to use LEDs in a Raspberry Pi.
-
 
 # Yayagram configuration
 
@@ -491,6 +512,9 @@ The rest of the configuration is informative messages you can use to customize t
 Finally "*tg_cli_path*" and "*tg_pub_path*" are the paths to the "*telegram-cli*" tool location and the Telegramm pub file.
 
 ## Telegram commands
+
+![command](https://content.instructables.com/ORIG/FRZ/8P8Z/KPCMGC1W/FRZ8P8ZKPCMGC1W.jpg)
+
 As retrieving the Telegram User ID and accessing the Raspberry to store is hard to accomplish, I created a simple set of commands to configure everything related.
 
 ### <!>addme
