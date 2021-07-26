@@ -6,7 +6,7 @@ import base64, sys
 from configparser import ConfigParser
 from pytg.utils import coroutine
 from pytg import Telegram
-from Adafruit_Thermal import *
+from thermalprinter import *
 from datetime import datetime
 from multiprocessing import Process
 import textwrap
@@ -19,6 +19,7 @@ import subprocess
 import signal
 import os
 import os.path
+import re
 
 STOP_TG = False
 STATUS = True
@@ -39,10 +40,10 @@ def main():
     receiver = tg.receiver
     sender = tg.sender
     print("Creating the printer")
-    printer = Adafruit_Thermal(
+    printer = ThermalPrinter(port=
         CONFIG['printer']['ADDR'],
-        CONFIG['printer']['BAUDRATE'],
-        timeout=5)
+        baudrate=CONFIG['printer']['BAUDRATE']
+        )
 
     # start the Receiver, so we can get messages!
     print("Starting the Telegram message receiver")
@@ -119,12 +120,10 @@ def test_connection(sender, printer):
     message = "Yayagram up: " + dt_string
     res = sender.send_msg(CONFIG['admin']['ADMIN_ID'], message)
     print("Test connection response: {response}".format(response=res))
-    printer.setSize('S')
-    printer.println("--------------------------------")
-    printer.println(message)
-    printer.println("--------------------------------")
+    printer.out("--------------------------------",size='S')
+    printer.out(message,size="S",codepage=CodePage.ISO_8859_1)
+    printer.out("--------------------------------",size='S')
     printer.feed(2)
-    printer.setDefault()
 
 def setup_pins():
     GPIO.setmode(GPIO.BCM)
@@ -255,6 +254,8 @@ def receiver_function(sender, printer):
               sender.send_msg(msg.peer.cmd, messageText)
               continue
 
+            clean_messageText=demojify(messageText)
+            
             print ("Valid message received from " + str(msg.peer.first_name) + ": " + messageText)
             try:
                 if (messageText.startswith(CONFIG['admin']['COMMAND_PREFIX'])):
@@ -270,22 +271,18 @@ def receiver_function(sender, printer):
                     STOP_TG = True
                     continue
 
-                printer.setSize('S')
-                printer.println("--------------------------------")
-                printer.setSize('L')
-                printer.println("De " + str(msg.peer.first_name) + ":")
+                
+                
+                printer.out("--------------------------------",size='S')
+                printer.out("De "+str(msg.peer.first_name) +" :",size='L',codepage=CodePage.ISO_8859_1)
 
-                lines = messageText.split("\n")
+                lines = clean_messageText.split("\n")
                 lists = (textwrap.TextWrapper(width=32,break_long_words=False).wrap(line) for line in lines)
                 messageToPrint  = "\n".join("\n".join(list) for list in lists)
-
-                printer.setSize('M')
-                printer.println()
-                printer.println(clean_str(messageToPrint))
-                printer.setSize('S')
-                printer.println("--------------------------------")
-
-                printer.setDefault()
+                
+                printer.out(messageToPrint,size="M",codepage=CodePage.ISO_8859_1)
+                printer.out("--------------------------------",size='S')
+                
                 printer.feed(2)
 
                 sender.send_msg(msg.peer.cmd, CONFIG['global']['THANK_YOU_FOR_MSG'])
@@ -304,6 +301,15 @@ def receiver_function(sender, printer):
         print ("Admin requested to quit")
         STOP_TG = True
         pass
+
+def demojify(text):
+    regrex_pattern = re.compile(pattern = "["
+        u"\U0001F600-\U0001F64F"  # emoticons
+        u"\U0001F300-\U0001F5FF"  # symbols & pictographs
+        u"\U0001F680-\U0001F6FF"  # transport & map symbols
+        u"\U0001F1E0-\U0001F1FF"  # flags (iOS)
+                           "]+", flags = re.UNICODE)
+    return regrex_pattern.sub(r'',text)
 
 def process_command(sender, command, msg):
     command = command.strip(CONFIG['admin']['COMMAND_PREFIX']).lower()
@@ -441,23 +447,6 @@ def is_user_admin(sender, msg):
 
     return True
 
-def clean_str(message):
-    message = message.replace('á' , 'a')
-    message = message.replace('Á' , 'A')
-    message = message.replace('é' , 'e')
-    message = message.replace('É' , 'E')
-    message = message.replace('í' , 'i')
-    message = message.replace('Í' , 'I')
-    message = message.replace('ó' , 'o')
-    message = message.replace('Ó' , 'O')
-    message = message.replace('ú' , 'u')
-    message = message.replace('Ú' , 'U')
-    message = message.replace('ñ' , 'n')
-    message = message.replace('Ñ' , 'N')
-    message = message.replace('ü' , 'u')
-    message = message.replace('Ü' , 'U')
-
-    return message
 
 def load_config():
     CONFIG.read(CONFIG_FILE)
