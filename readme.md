@@ -407,7 +407,7 @@ sudo systemctl start yayagram.service
 ```
 And, enable it so it starts the next time you reboot your Raspberry Pi:
 ```
-sudo systemctl enable example.service
+sudo systemctl enable yayagram.service
 ```
 
 # Yayagram configuration
